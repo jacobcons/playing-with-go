@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 )
 
@@ -22,25 +21,19 @@ func funnel(str1 string, str2 string) bool {
 	return false
 }
 
-func bonus(str string) []string {
-	allWords := map[string]bool{}
+var allWords = map[string]bool{}
 
+func populateAllWords() {
 	// read file with words => create set of all words
-	file, err := os.Open("enable1.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
+	var file, _ = os.Open("enable1.txt")
+	var scanner = bufio.NewScanner(file)
 	for scanner.Scan() {
 		allWords[scanner.Text()] = true
 	}
+	file.Close()
+}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-
+func bonus(str string) []string {
 	// remove single char from each position in str, add any that make valid words to set
 	wordSet := map[string]bool{}
 	for i := range str {
@@ -58,6 +51,16 @@ func bonus(str string) []string {
 	return wordList
 }
 
+func bonus2() []string {
+	wordList := []string{}
+	for word := range allWords {
+		if len(bonus(word)) == 5 {
+			wordList = append(wordList, word)
+		}
+	}
+	return wordList
+}
+
 func main() {
 	// main challenge
 	fmt.Println(funnel("leave", "eave"))
@@ -67,8 +70,14 @@ func main() {
 	fmt.Println(funnel("sleet", "lets"))
 	fmt.Println(funnel("skiff", "ski"))
 
+	// populate the set with all words
+	populateAllWords()
+
 	// bonus 1
 	fmt.Println(bonus("dragoon"))
 	fmt.Println(bonus("boats"))
 	fmt.Println(bonus("affidavit"))
+
+	// bonus 2
+	fmt.Println(len(bonus2()))
 }
